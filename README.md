@@ -1,16 +1,8 @@
 # Telecom Infrastructure Provisioning Platform
 
-A professional portfolio-style project for telecom infrastructure automation using Infrastructure as Code (IaC). This repository demonstrates how infrastructure can be provisioned, standardized, and operated faster and more reliably in telecom environments using Terraform and containerized deployment patterns.
+A modern Infrastructure as Code (IaC) project designed to showcase how telecom infrastructure can be provisioned, standardized, and deployed in a repeatable and scalable way using Terraform and AWS.
 
-## Overview
-
-This project was created to address a common challenge in telecom operations: provisioning infrastructure repeatedly, consistently, and with minimal manual effort. Instead of setting up servers manually, the solution models the infrastructure as code so it can be reproduced across environments with predictable outcomes.
-
-The repository includes:
-- a presentation landing page for the solution
-- a working Docker-based static deployment
-- a Terraform configuration prototype for AWS provisioning
-- a professional project README for operational guidance and documentation
+This repository combines a professional landing page, a deployable Docker container, and an AWS provisioning template to demonstrate a practical telecom automation workflow.
 
 ## Why this project matters
 
@@ -18,61 +10,70 @@ Telecom environments often require:
 - rapid environment setup
 - consistent node configuration
 - secure and repeatable provisioning
-- faster rollback and redeployment
-- reduced configuration drift
+- lower operational risk
+- faster rollout and rollback
 
-This project demonstrates how IaC can reduce operational complexity and improve reliability in telecom infrastructure workflows.
+This project demonstrates how infrastructure can be treated as code rather than manual setup, reducing configuration drift and improving deployment confidence across environments.
+
+## Solution overview
+
+This project provides a simple but effective reference architecture for provisioning telecom-related infrastructure in the cloud with:
+- Terraform for infrastructure definition
+- AWS for cloud resource provisioning
+- Docker for local hosting and demo deployment
+- GitHub for version-controlled delivery and automation
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-    A[User / Operator] --> B[GitHub Repository]
+    A[Operator / DevOps Team] --> B[GitHub Repository]
     B --> C[Terraform Configuration]
     C --> D[AWS Cloud Provider]
-    D --> E[EC2 Instance]
-    E --> F[Docker Runtime]
-    F --> G[Nginx / App Layer]
+    D --> E[VPC + Subnet + Security Group]
+    E --> F[EC2 Instance]
+    F --> G[Docker Runtime]
     G --> H[Telecom Service Exposure]
 
-    I[Security Group / Access Rules] --> E
-    J[Infrastructure Variables] --> C
+    I[Infrastructure Variables] --> C
+    J[Network Rules / Access Policies] --> E
 ```
 
 ## Operational flow
 
 ```mermaid
 sequenceDiagram
-    participant Operator
+    participant User
     participant Repo
     participant Terraform
     participant AWS
     participant App
 
-    Operator->>Repo: Review IaC definition
-    Operator->>Terraform: terraform init
-    Operator->>Terraform: terraform plan
-    Terraform->>AWS: Validate resources and region
-    Operator->>Terraform: terraform apply
-    AWS-->>App: Launch EC2 instance
-    App-->>Operator: Service becomes available
+    User->>Repo: Review IaC definitions
+    User->>Terraform: terraform init
+    User->>Terraform: terraform plan
+    Terraform->>AWS: Validate region, VPC, and EC2 requirements
+    User->>Terraform: terraform apply
+    AWS-->>App: Provision infrastructure
+    App-->>User: Service becomes available
 ```
 
 ## Project goals
 
-- Automate infrastructure provisioning with code
+- Automate telecom infrastructure provisioning with code
 - Reduce manual configuration errors
 - Improve repeatability and predictability
-- Enable faster deployment of telecom environments
-- Create a scalable, reusable foundation for cloud infra automation
+- Support faster deployment and recovery
+- Create a reusable foundation for future cloud automation projects
 
 ## Features
 
-- Infrastructure as Code using Terraform
-- AWS EC2 provisioning template
+- Terraform-based AWS provisioning
+- EC2 instance deployment with VPC, subnet, and IGW
+- Security group configuration for SSH, HTTP, and HTTPS
 - Dockerized static landing page deployment
-- GitHub-ready documentation and project branding
-- Reusable structure for future expansion to Kubernetes, Ansible, and CI/CD
+- Professional documentation and portfolio-ready presentation
+- Extensible structure for future Ansible, Kubernetes, and CI/CD integration
 
 ## Repository structure
 
@@ -83,20 +84,19 @@ sequenceDiagram
 ├── main.tf
 ├── Dockerfile
 ├── .gitignore
-├── pdfs/
-│   └── (project documentation assets if added later)
+├── IaC Provisioning Telecomm Report1.pdf
+├── Telecomm_HLD_DOCX.pdf
 └── .github/
-    └── workflow files (if used in future)
 ```
 
 ## Prerequisites
 
-Before using the project, ensure the following are installed:
+Before running the project, ensure you have:
 
 - Docker
 - Terraform v1.5 or newer
 - AWS CLI configured with valid credentials
-- An AWS account with permission to create EC2 instances
+- An AWS account with permission to create EC2 resources
 
 ## Run locally with Docker
 
@@ -112,7 +112,7 @@ Run the container:
 docker run --name telecom-iac-demo -p 8080:80 telecom-iac-demo
 ```
 
-Open the app in a browser:
+Open the app in your browser:
 
 ```text
 http://localhost:8080
@@ -144,7 +144,7 @@ Apply the infrastructure:
 terraform apply
 ```
 
-Destroy when no longer needed:
+Destroy the infrastructure when no longer needed:
 
 ```bash
 terraform destroy
@@ -152,56 +152,57 @@ terraform destroy
 
 ## AWS configuration notes
 
-Set up AWS credentials before applying Terraform:
+Configure AWS credentials before deployment:
 
 ```bash
 aws configure
 ```
 
-The default configuration in this repo uses:
+Default values in this repository are:
 - region: ap-south-1
 - instance type: t3.micro
-- EC2 provisioning demo basics
+- VPC CIDR: 10.0.0.0/16
+- subnet: 10.0.1.0/24
 
-You can customize the Terraform variables in `main.tf` to match your environment.
+You can customize these variables in `main.tf` to match your environment requirements.
 
 ## How the project works
 
-1. The repository stores infrastructure configuration as code.
-2. Terraform reads the configuration and prepares cloud resources.
-3. An EC2 instance is launched in the target AWS region.
-4. The system can host or serve containerized applications.
-5. The project remains version-controlled and repeatable across environments.
+1. The repository stores the infrastructure configuration as code.
+2. Terraform reads the definitions and prepares the required AWS resources.
+3. A VPC, subnet, internet gateway, route table, and EC2 instance are created.
+4. The instance is configured to serve traffic and can support additional workloads.
+5. The deployment remains version-controlled, repeatable, and easy to audit.
 
 ## Security and reliability considerations
 
-This project is intentionally kept simple for learning and demonstration, but the following should be considered for production use:
+This project is intentionally kept simple for demonstration and learning, but production environments should include:
 
-- use IAM roles with least-privilege access
-- store secrets in environment variables or secret stores
-- restrict inbound security group rules
-- use remote state storage for real deployments
-- add monitoring, logging, and backup strategies
+- least-privilege IAM policies
+- secure secret management
+- restricted CIDR access for SSH and admin ports
+- remote state storage for Terraform
+- monitoring, logging, and backup strategies
 
 ## Suggested next enhancements
 
-- add Ansible playbooks for configuration management
+- add Ansible playbooks for configuration automation
 - integrate GitHub Actions for CI/CD
 - add Terraform remote state backend
-- connect to a real telecom application workload
-- deploy via Kubernetes for higher scalability
+- connect this prototype to a real telecom workload
+- deploy the stack with Kubernetes or a container orchestration platform
 
 ## Project status
 
-This repository is a polished demo/prototype project intended to showcase telecom IaC automation and infrastructure provisioning concepts in a professional portfolio format.
+This repository is a polished demo/prototype project intended to showcase telecom infrastructure automation and cloud provisioning concepts in a professional portfolio format.
 
-## Team / ownership
+## Ownership
 
-This project is developed and owned by Mohd Dilshad Khan and the project team as a telecom infrastructure automation initiative.
+This project is developed and maintained by Mohd Dilshad Khan as a telecom infrastructure automation initiative.
 
 ## License
 
-This project is currently provided as an educational and portfolio project without a formal license file. If you plan to publish or reuse it commercially, add an appropriate open-source license.
+This repository currently does not include a formal license file. If you plan to publish or reuse it commercially, add an appropriate open-source license before distribution.
 
 ---
 

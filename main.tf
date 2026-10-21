@@ -13,10 +13,28 @@ provider "aws" {
   region = var.aws_region
 }
 
+locals {
+  project_name = "telecom-iac"
+  environment  = var.environment
+
+  common_tags = {
+    Project     = local.project_name
+    Environment = local.environment
+    ManagedBy   = "Terraform"
+    Owner       = "Mohd Dilshad Khan"
+  }
+}
+
 variable "aws_region" {
   description = "AWS region for provisioning"
   type        = string
   default     = "ap-south-1"
+}
+
+variable "environment" {
+  description = "Deployment environment name"
+  type        = string
+  default     = "demo"
 }
 
 variable "instance_name" {
@@ -32,7 +50,7 @@ variable "instance_type" {
 }
 
 variable "ami_id" {
-  description = "AMI ID to use for EC2; if left empty, the latest Amazon Linux 2 AMI is used"
+  description = "AMI ID to use for the EC2 instance; if left empty, the latest Amazon Linux 2 AMI is used"
   type        = string
   default     = ""
 }
@@ -47,6 +65,30 @@ variable "vpc_cidr" {
   description = "CIDR block for the VPC"
   type        = string
   default     = "10.0.0.0/16"
+}
+
+variable "subnet_cidr" {
+  description = "CIDR block for the public subnet"
+  type        = string
+  default     = "10.0.1.0/24"
+}
+
+variable "allowed_ssh_cidr" {
+  description = "CIDR allowed to connect via SSH"
+  type        = string
+  default     = "0.0.0.0/0"
+}
+
+variable "allowed_http_cidr" {
+  description = "CIDR allowed to access the web application over HTTP"
+  type        = string
+  default     = "0.0.0.0/0"
+}
+
+variable "allowed_https_cidr" {
+  description = "CIDR allowed to access the web application over HTTPS"
+  type        = string
+  default     = "0.0.0.0/0"
 }
 
 data "aws_ami" "amazon_linux_2" {
@@ -69,28 +111,28 @@ resource "aws_vpc" "telecom_vpc" {
   enable_dns_support   = true
   enable_dns_hostnames = true
 
-  tags = {
-    Name = "telecom-iac-vpc"
-  }
+  tags = merge(local.common_tags, {
+    Name = "${local.project_name}-vpc"
+  })
 }
 
 resource "aws_subnet" "telecom_subnet" {
   vpc_id                  = aws_vpc.telecom_vpc.id
-  cidr_block              = "10.0.1.0/24"
+  cidr_block              = var.subnet_cidr
   map_public_ip_on_launch = true
   availability_zone       = "${var.aws_region}a"
 
-  tags = {
-    Name = "telecom-iac-subnet"
-  }
+  tags = merge(local.common_tags, {
+    Name = "${local.project_name}-subnet"
+  })
 }
 
 resource "aws_internet_gateway" "telecom_igw" {
   vpc_id = aws_vpc.telecom_vpc.id
 
-  tags = {
-    Name = "telecom-iac-igw"
-  }
+  tags = merge(local.common_tags, {
+    Name = "${local.project_name}-igw"
+  })
 }
 
 resource "aws_route_table" "telecom_rt" {
@@ -101,9 +143,9 @@ resource "aws_route_table" "telecom_rt" {
     gateway_id = aws_internet_gateway.telecom_igw.id
   }
 
-  tags = {
-    Name = "telecom-iac-rt"
-  }
+  tags = merge(local.common_tags, {
+    Name = "${local.project_name}-route-table"
+  })
 }
 
 resource "aws_route_table_association" "telecom_rta" {
@@ -112,8 +154,8 @@ resource "aws_route_table_association" "telecom_rta" {
 }
 
 resource "aws_security_group" "telecom_sg" {
-  name        = "telecom-iac-sg"
-  description = "Security group for telecom demo instance"
+  name        = "${local.project_name}-sg"
+  description = "Security group for the telecom IaC demo instance"
   vpc_id      = aws_vpc.telecom_vpc.id
 
   ingress {
@@ -121,7 +163,7 @@ resource "aws_security_group" "telecom_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.allowed_ssh_cidr]
   }
 
   ingress {
@@ -129,7 +171,7 @@ resource "aws_security_group" "telecom_sg" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.allowed_http_cidr]
   }
 
   ingress {
@@ -137,7 +179,7 @@ resource "aws_security_group" "telecom_sg" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.allowed_https_cidr]
   }
 
   egress {
@@ -147,9 +189,9 @@ resource "aws_security_group" "telecom_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    Name = "telecom-iac-sg"
-  }
+  tags = merge(local.common_tags, {
+    Name = "${local.project_name}-sg"
+  })
 }
 
 resource "aws_instance" "telecom_instance" {
@@ -169,9 +211,13 @@ resource "aws_instance" "telecom_instance" {
               echo "Telecom IaC Demo Instance" > /var/www/html/index.html
               EOF
 
-  tags = {
-    Name = var.instance_name
+  metadata_options {
+    http_tokens = "required"
   }
+
+  tags = merge(local.common_tags, {
+    Name = var.instance_name
+  })
 }
 
 output "instance_id" {
@@ -187,4 +233,14 @@ output "public_ip" {
 output "public_dns" {
   description = "Public DNS name of the EC2 instance"
   value       = aws_instance.telecom_instance.public_dns
+}
+
+output "vpc_id" {
+  description = "The VPC ID created for the telecom system"
+  value       = aws_vpc.telecom_vpc.id
+}
+
+output "security_group_id" {
+  description = "Security group attached to the instance"
+  value       = aws_security_group.telecom_sg.id
 }

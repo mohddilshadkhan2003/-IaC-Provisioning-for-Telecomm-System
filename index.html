@@ -1,874 +1,856 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TeleNetResolve IaC - AI Telecom Network Resolution</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dilshad Telecom IaC | Automated Provisioning</title>
+  <meta name="description" content="Telecom infrastructure provisioning and automation platform built with Terraform, Docker, and AWS-ready IaC patterns." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <style>
+    :root {
+      --bg: #07111f;
+      --bg-soft: #0d1b2a;
+      --panel: rgba(15, 23, 42, 0.8);
+      --card: #ffffff;
+      --card-soft: #f4f8ff;
+      --text: #0f172a;
+      --text-light: #475569;
+      --primary: #14b8ff;
+      --primary-strong: #2563eb;
+      --secondary: #18c6a3;
+      --accent: #f59e0b;
+      --border: rgba(148, 163, 184, 0.2);
+      --shadow: 0 25px 60px rgba(15, 23, 42, 0.18);
+      --max: 1180px;
+    }
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            line-height: 1.6;
-            color: #333;
-            overflow-x: hidden;
-        }
+    * { box-sizing: border-box; }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
+    html { scroll-behavior: smooth; }
 
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(180deg, #07111f 0%, #0b1324 100%);
+      color: var(--text);
+      line-height: 1.6;
+    }
 
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(45deg, #00d4ff, #667eea);
-            border-radius: 10px;
-        }
+    a { text-decoration: none; }
+    img { max-width: 100%; display: block; }
 
-        /* Navbar */
-        .navbar {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            padding: 1rem 0;
-            transition: all 0.3s ease;
-        }
+    .container {
+      width: min(var(--max), calc(100% - 32px));
+      margin: 0 auto;
+    }
 
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 2rem;
-        }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      backdrop-filter: blur(12px);
+      background: rgba(7, 17, 31, 0.7);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+    }
 
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 800;
-            background: linear-gradient(45deg, #00d4ff, #667eea);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 78px;
+      gap: 24px;
+    }
 
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-        }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      color: white;
+      font-size: 1.1rem;
+    }
 
-        .nav-link {
-            text-decoration: none;
-            color: #333;
-            font-weight: 500;
-            transition: color 0.3s ease;
-            position: relative;
-        }
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+      box-shadow: 0 10px 26px rgba(37, 99, 235, 0.35);
+    }
 
-        .nav-link:hover {
-            color: #00d4ff;
-        }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
 
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: -5px;
-            left: 0;
-            background: linear-gradient(45deg, #00d4ff, #667eea);
-            transition: width 0.3s ease;
-        }
+    .nav-links a {
+      color: rgba(255,255,255,0.72);
+      font-size: 0.95rem;
+      transition: color 0.2s ease;
+    }
 
-        .nav-link:hover::after {
-            width: 100%;
-        }
+    .nav-links a:hover {
+      color: #fff;
+    }
 
-        /* Hero Section */
-        .hero {
-            height: 100vh;
-            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.88rem 1.4rem;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 14px 30px rgba(20, 184, 255, 0.28);
+    }
 
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%"><stop offset="0%" stop-color="%23ffffff" stop-opacity="0.1"/><stop offset="100%" stop-color="%2300d4ff" stop-opacity="0.03"/></radialGradient></defs><circle cx="300" cy="200" r="100" fill="url(%23a)"><animate attributeName="r" values="10;100;10" dur="8s" repeatCount="indefinite"/><animate attributeName="cx" values="100;300;500" dur="8s" repeatCount="indefinite"/><animate attributeName="cy" values="100;200;300" dur="8s" repeatCount="indefinite"/></circle><circle cx="700" cy="600" r="80" fill="url(%23a)"><animate attributeName="r" values="15;80;15" dur="10s" repeatCount="indefinite"/><animate attributeName="cx" values="500;700;900" dur="10s" repeatCount="indefinite"/><animate attributeName="cy" values="400;600;800" dur="10s" repeatCount="indefinite"/></circle></svg>');
-            animation: float 20s ease-in-out infinite;
-        }
+    .hero {
+      position: relative;
+      padding: 92px 0 68px;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(7, 17, 31, 0.93), rgba(11, 19, 36, 0.96));
+    }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(180deg); }
-        }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 15% 22%, rgba(20,184,255,0.18), transparent 26%),
+        radial-gradient(circle at 88% 20%, rgba(18,198,163,0.12), transparent 24%),
+        linear-gradient(135deg, rgba(20,184,255,0.08), transparent 45%);
+      pointer-events: none;
+    }
 
-        .hero-content {
-            max-width: 900px;
-            padding: 0 2rem;
-            position: relative;
-            z-index: 2;
-        }
+    .hero-grid {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 42px;
+      align-items: center;
+      z-index: 1;
+    }
 
-        .hero-badge {
-            display: inline-block;
-            background: linear-gradient(45deg, #00d4ff, #667eea);
-            color: white;
-            padding: 0.5rem 1.5rem;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            animation: slideInUp 1s ease-out;
-        }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(20,184,255,0.12);
+      border: 1px solid rgba(20,184,255,0.28);
+      color: #9fe8ff;
+      padding: 0.5rem 0.9rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
 
-        .hero h1 {
-            font-size: 4rem;
-            font-weight: 800;
-            background: linear-gradient(45deg, #ffffff, #00d4ff, #667eea);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 1.5rem;
-            animation: slideInUp 1s ease-out 0.2s both;
-        }
+    h1 {
+      margin: 18px 0 18px;
+      font-size: clamp(2.8rem, 4vw, 5rem);
+      line-height: 1.05;
+      color: #f8fcff;
+      letter-spacing: -0.06em;
+    }
 
-        .hero-subtitle {
-            font-size: 1.3rem;
-            color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 1rem;
-            animation: slideInUp 1s ease-out 0.4s both;
-        }
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, #dff7ff 0%, var(--primary) 30%, #8de7ff 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
 
-        .hero p {
-            font-size: 1.2rem;
-            color: rgba(255, 255, 255, 0.85);
-            margin-bottom: 2.5rem;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-            animation: slideInUp 1s ease-out 0.6s both;
-        }
+    .hero-copy {
+      color: rgba(226, 232, 240, 0.8);
+      font-size: 1.12rem;
+      max-width: 670px;
+      margin-bottom: 28px;
+    }
 
-        .cta-buttons {
-            display: flex;
-            gap: 1.5rem;
-            justify-content: center;
-            flex-wrap: wrap;
-            animation: slideInUp 1s ease-out 0.8s both;
-        }
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
 
-        .cta-primary {
-            padding: 1.2rem 3rem;
-            background: linear-gradient(45deg, #00d4ff, #667eea);
-            color: white;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.3);
-        }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem 1.5rem;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.97rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
 
-        .cta-secondary {
-            padding: 1.2rem 3rem;
-            background: transparent;
-            color: white;
-            text-decoration: none;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-        }
+    .btn:hover {
+      transform: translateY(-2px);
+    }
 
-        .cta-primary:hover, .cta-secondary:hover {
-            transform: translateY(-5px);
-        }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+      color: white;
+      box-shadow: 0 18px 32px rgba(20,184,255,0.24);
+    }
 
-        .cta-primary:hover {
-            box-shadow: 0 25px 60px rgba(0, 212, 255, 0.4);
-        }
+    .btn-secondary {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(148,163,184,0.28);
+      color: white;
+    }
 
-        .cta-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.6);
-        }
+    .mini-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin-top: 20px;
+    }
 
-        /* Sections */
-        .section {
-            padding: 100px 0;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding-left: 2rem;
-            padding-right: 2rem;
-        }
+    .mini-stat {
+      min-width: 150px;
+      padding: 18px 16px;
+      border-radius: 18px;
+      background: rgba(15, 23, 42, 0.64);
+      border: 1px solid var(--border);
+      color: white;
+    }
 
-        .section-title {
-            text-align: center;
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            background: linear-gradient(45deg, #333, #00d4ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+    .mini-stat strong {
+      display: block;
+      font-size: 1.43rem;
+      letter-spacing: -0.04em;
+    }
 
-        .section-subtitle {
-            text-align: center;
-            font-size: 1.3rem;
-            color: #666;
-            max-width: 700px;
-            margin: 0 auto 4rem;
-        }
+    .mini-stat span {
+      color: rgba(226, 232, 240, 0.7);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
 
-        /* Features Section */
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-            gap: 3rem;
-            margin-top: 4rem;
-        }
+    .dashboard {
+      position: relative;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(148,163,184,0.2);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+      backdrop-filter: blur(12px);
+    }
 
-        .feature-card {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 3.5rem 2.5rem;
-            border-radius: 25px;
-            text-align: center;
-            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.08);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            overflow: hidden;
-            border: 1px solid rgba(0, 212, 255, 0.1);
-        }
+    .device-window {
+      background: linear-gradient(180deg, rgba(15,23,42,0.96), rgba(15,23,42,0.84));
+      border-radius: 22px;
+      border: 1px solid rgba(148,163,184,0.22);
+      overflow: hidden;
+    }
 
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.1), transparent);
-            transition: left 0.6s;
-        }
+    .window-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(148,163,184,0.18);
+      background: rgba(15,23,42,0.92);
+    }
 
-        .feature-card:hover::before {
-            left: 100%;
-        }
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      display: inline-block;
+    }
 
-        .feature-card:hover {
-            transform: translateY(-20px) scale(1.02);
-            box-shadow: 0 40px 100px rgba(0, 212, 255, 0.25);
-            border-color: #00d4ff;
-        }
+    .dot.red { background: #ff6b6b; }
+    .dot.yellow { background: #fbbf24; }
+    .dot.green { background: #34d399; }
 
-        .feature-icon {
-            font-size: 4.5rem;
-            background: linear-gradient(45deg, #00d4ff, #667eea);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 2rem;
-            display: block;
-        }
+    .window-body {
+      padding: 22px;
+      background: linear-gradient(180deg, rgba(15,23,42,0.86), rgba(15,23,42,0.94));
+    }
 
-        .feature-card h3 {
-            font-size: 1.6rem;
-            font-weight: 700;
-            margin-bottom: 1.2rem;
-            color: #2d3748;
-        }
+    .status-card {
+      background: rgba(20,184,255,0.08);
+      border: 1px solid rgba(20,184,255,0.25);
+      border-radius: 18px;
+      padding: 16px 18px;
+      margin-bottom: 18px;
+    }
 
-        .feature-card p {
-            color: #64748b;
-            line-height: 1.7;
-        }
+    .status-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: white;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
 
-        /* Problem-Solution Section */
-        .problem-solution {
-            background: linear-gradient(135deg, #f8faff 0%, #e8f4fd 100%);
-            padding: 120px 0;
-        }
+    .live {
+      background: rgba(52, 211, 153, 0.12);
+      color: #8af0c8;
+      border: 1px solid rgba(52,211,153,0.25);
+      border-radius: 999px;
+      padding: 0.3rem 0.7rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
 
-        .ps-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 5rem;
-            align-items: center;
-        }
+    .grid-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
 
-        .ps-card {
-            padding: 3rem;
-            border-radius: 20px;
-            position: relative;
-        }
+    .mini-card {
+      background: rgba(148,163,184,0.04);
+      border: 1px solid rgba(148,163,184,0.18);
+      border-radius: 16px;
+      padding: 18px 16px;
+      color: white;
+    }
 
-        .problem-card {
-            background: rgba(255, 255, 255, 0.9);
-            border-left: 5px solid #ef4444;
-            box-shadow: 0 20px 60px rgba(239, 68, 68, 0.1);
-        }
+    .mini-card .label {
+      color: rgba(226, 232, 240, 0.7);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      display: block;
+    }
 
-        .solution-card {
-            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(102, 126, 234, 0.1));
-            border-left: 5px solid #00d4ff;
-            box-shadow: 0 20px 60px rgba(0, 212, 255, 0.2);
-        }
+    .mini-card strong {
+      font-size: 1.8rem;
+      letter-spacing: -0.06em;
+      display: block;
+    }
 
-        /* Stats Section */
-        .stats {
-            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 100%);
-            color: white;
-            text-align: center;
-        }
+    section {
+      padding: 88px 0;
+    }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 3rem;
-            margin-top: 4rem;
-        }
+    .section-head {
+      text-align: center;
+      margin-bottom: 42px;
+    }
 
-        .stat-item h3 {
-            font-size: 4rem;
-            font-weight: 800;
-            background: linear-gradient(45deg, #00d4ff, #667eea);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 0.8rem;
-        }
+    .section-head .tag {
+      display: inline-flex;
+      padding: 0.55rem 0.8rem;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: rgba(20,184,255,0.08);
+      border: 1px solid rgba(20,184,255,0.22);
+      color: var(--primary-strong);
+      font-weight: 700;
+    }
 
-        /* Team Section */
-        .team-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2.5rem;
-            margin-top: 4rem;
-        }
+    h2 {
+      font-size: clamp(2rem, 3vw, 3rem);
+      letter-spacing: -0.05em;
+      margin: 18px 0 12px;
+      color: var(--text);
+    }
 
-        .team-card {
-            background: linear-gradient(145deg, #ffffff, #f8f9ff);
-            padding: 3rem 2rem;
-            border-radius: 25px;
-            text-align: center;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
-            transition: all 0.4s ease;
-            border: 1px solid rgba(0, 212, 255, 0.15);
-            position: relative;
-            overflow: hidden;
-        }
+    .section-head p {
+      margin: 0 auto;
+      max-width: 720px;
+      color: var(--text-light);
+      font-size: 1.06rem;
+    }
 
-        .team-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #00d4ff, #667eea);
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
-        }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 24px;
+    }
 
-        .team-card:hover::before {
-            transform: scaleX(1);
-        }
+    .feature {
+      background: var(--card);
+      border: 1px solid rgba(148,163,184,0.18);
+      border-radius: 22px;
+      padding: 30px 22px;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
 
-        .team-card:hover {
-            transform: translateY(-15px);
-            box-shadow: 0 35px 80px rgba(0, 212, 255, 0.2);
-        }
+    .feature:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 18px 34px rgba(37, 99, 235, 0.12);
+    }
 
-        .team-id {
-            background: linear-gradient(45deg, #00d4ff, #667eea);
-            color: white;
-            padding: 0.6rem 1.5rem;
-            border-radius: 30px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            display: inline-block;
-            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.3);
-        }
+    .feature i {
+      width: 58px;
+      height: 58px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(20,184,255,0.12), rgba(37,99,235,0.1));
+      color: var(--primary-strong);
+      font-size: 1.5rem;
+      margin-bottom: 18px;
+    }
 
-        .team-card h3 {
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: #2d3748;
-        }
+    .feature h3 {
+      margin: 0 0 10px;
+      font-size: 1.3rem;
+      color: var(--text);
+    }
 
-        .team-role {
-            color: #64748b;
-            font-weight: 500;
-        }
+    .feature p {
+      margin: 0;
+      color: var(--text-light);
+    }
 
-        /* Tech Stack */
-        .tech-stack {
-            background: linear-gradient(135deg, #f8faff 0%, #e8f4fd 100%);
-        }
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 26px;
+      align-items: center;
+    }
 
-        .tech-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 2rem;
-            justify-items: center;
-            margin-top: 4rem;
-        }
+    .panel {
+      background: linear-gradient(180deg, #ffffff, #f8fbff);
+      border-radius: 26px;
+      border: 1px solid rgba(148,163,184,0.18);
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
 
-        .tech-item {
-            padding: 2rem 1rem;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
-            text-align: center;
-            width: 140px;
-            height: 140px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    .panel ul {
+      margin: 20px 0 0;
+      padding-left: 18px;
+      color: var(--text-light);
+    }
 
-        .tech-item:hover {
-            transform: translateY(-10px) scale(1.05);
-            box-shadow: 0 25px 60px rgba(0, 212, 255, 0.2);
-        }
+    .panel li + li {
+      margin-top: 12px;
+    }
 
-        .tech-item i {
-            font-size: 3rem;
-            color: #00d4ff;
-        }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 18px;
+      margin-top: 20px;
+    }
 
-        /* Footer */
-        .footer {
-            background: #111;
-            color: white;
-            text-align: center;
-            padding: 4rem 0 2rem;
-        }
+    .step {
+      background: var(--card-soft);
+      border: 1px solid rgba(148,163,184,0.18);
+      border-radius: 18px;
+      padding: 20px 18px;
+    }
 
-        /* Animations */
-        @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+    .step-number {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+      color: white;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
 
-        .animate-on-scroll {
-            opacity: 0;
-            transform: translateY(60px);
-            transition: all 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+    .step h3 {
+      margin: 0 0 8px;
+      font-size: 1.08rem;
+    }
 
-        .animate-on-scroll.animated {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    .step p {
+      margin: 0;
+      color: var(--text-light);
+      font-size: 0.94rem;
+    }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 2.8rem; }
-            .ps-grid { grid-template-columns: 1fr; gap: 3rem; }
-            .cta-buttons { flex-direction: column; align-items: center; }
-            .section-title { font-size: 2.2rem; }
-            .features-grid { grid-template-columns: 1fr; }
-        }
-    </style>
+    .stack-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0,1fr));
+      gap: 18px;
+      margin-top: 28px;
+    }
+
+    .stack-item {
+      background: white;
+      border: 1px solid rgba(148,163,184,0.18);
+      border-radius: 18px;
+      padding: 20px 14px;
+      text-align: center;
+      transition: transform 0.2s ease;
+    }
+
+    .stack-item:hover { transform: translateY(-4px); }
+
+    .stack-item i {
+      font-size: 2.1rem;
+      color: var(--primary-strong);
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .stack-item span {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .cta-band {
+      padding: 72px 0 116px;
+      background: linear-gradient(135deg, #0b1230, #111b32 52%, #0f1f3f);
+      color: white;
+    }
+
+    .cta-box {
+      border: 1px solid rgba(148,163,184,0.18);
+      border-radius: 28px;
+      background: rgba(255,255,255,0.03);
+      padding: 40px 26px;
+      text-align: center;
+    }
+
+    .cta-box h2 {
+      color: white;
+      margin-bottom: 10px;
+    }
+
+    .cta-box p {
+      color: rgba(226,232,240,0.78);
+      max-width: 650px;
+      margin: 0 auto 26px;
+    }
+
+    footer {
+      background: #060d1a;
+      color: rgba(255,255,255,0.72);
+      border-top: 1px solid rgba(148,163,184,0.12);
+      padding: 30px 0 42px;
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .socials {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 1.1rem;
+    }
+
+    .socials a {
+      color: rgba(255,255,255,0.72);
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(148,163,184,0.18);
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid,
+      .split,
+      .feature-grid,
+      .stack-grid,
+      .flow {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .hero-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 760px) {
+      .nav-links { display: none; }
+      .feature-grid,
+      .split,
+      .stack-grid,
+      .flow,
+      .grid-cards { grid-template-columns: 1fr; }
+
+      .nav { min-height: 70px; }
+      .hero { padding-top: 60px; }
+      h1 { font-size: 2.7rem; }
+      .brand { font-size: 1rem; }
+      .nav-cta { display: none; }
+    }
+  </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="logo">
-                <i class="fas fa-network-wired"></i> TeleNetResolve
+  <header class="topbar">
+    <div class="container nav">
+      <a href="#top" class="brand" aria-label="Dilshad Telecom IaC home">
+        <span class="brand-mark"><i class="fa-solid fa-network-wired"></i></span>
+        <span>Dilshad Telecom IaC</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#architecture">Architecture</a></li>
+        <li><a href="#workflow">Workflow</a></li>
+        <li><a href="#stack">Stack</a></li>
+      </ul>
+
+      <a href="#deploy" class="nav-cta">Launch Demo</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <div class="eyebrow"><i class="fa-solid fa-shield-heart"></i> Infrastructure as Code</div>
+          <h1>Build smarter <span class="gradient">telecom infrastructure</span> with automation.</h1>
+          <p class="hero-copy">
+            A modern IaC platform for telecom environments that reduces manual setup time, improves consistency,
+            and helps teams provision and operate infrastructure in a repeatable, resilient way.
+          </p>
+
+          <div class="hero-actions">
+            <a href="#overview" class="btn btn-primary">Explore Solution</a>
+            <a href="#deploy" class="btn btn-secondary">Run Locally</a>
+          </div>
+
+          <div class="mini-stats">
+            <div class="mini-stat">
+              <strong>95%</strong>
+              <span>Faster setup</span>
             </div>
-            <ul class="nav-menu">            
-                <li><a href="#home" class="nav-link">Home</a></li>
-                <li><a href="#features" class="nav-link">Features</a></li>
-                <li><a href="#solution" class="nav-link">Solution</a></li>
-                <li><a href="#team" class="nav-link">Team</a></li>
-                <li><a href="#tech" class="nav-link">Tech</a></li>
+            <div class="mini-stat">
+              <strong>100%</strong>
+              <span>Repeatable</span>
+            </div>
+            <div class="mini-stat">
+              <strong>0</strong>
+              <span>Manual drift</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard" aria-label="Project dashboard preview">
+          <div class="device-window">
+            <div class="window-header">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+            </div>
+            <div class="window-body">
+              <div class="status-card">
+                <div class="status-top">
+                  <span>Telecom Provisioning Status</span>
+                  <span class="live">Live</span>
+                </div>
+                <div style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Infrastructure automation pipeline active</div>
+              </div>
+
+              <div class="grid-cards">
+                <div class="mini-card">
+                  <span class="label">Nodes</span>
+                  <strong>24</strong>
+                </div>
+                <div class="mini-card">
+                  <span class="label">Region</span>
+                  <strong>ap-south-1</strong>
+                </div>
+                <div class="mini-card">
+                  <span class="label">Downtime</span>
+                  <strong>0.2%</strong>
+                </div>
+                <div class="mini-card">
+                  <span class="label">Deploy</span>
+                  <strong>2 min</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="overview">
+      <div class="container">
+        <div class="section-head">
+          <span class="tag">Overview</span>
+          <h2>Purpose-built for telecom operations</h2>
+          <p>
+            This project demonstrates how telecom systems can be provisioned programmatically with a secure, repeatable, and scalable approach using modern IaC practices.
+          </p>
+        </div>
+
+        <div class="feature-grid">
+          <article class="feature">
+            <i class="fa-solid fa-robot"></i>
+            <h3>Automation-first</h3>
+            <p>Reduce manual setup and eliminate repetitive infrastructure work across environments with codified deployment patterns.</p>
+          </article>
+
+          <article class="feature">
+            <i class="fa-solid fa-cloud"></i>
+            <h3>Cloud-ready</h3>
+            <p>Built around AWS provisioning patterns that can scale to telecom production workloads and multi-environment operations.</p>
+          </article>
+
+          <article class="feature">
+            <i class="fa-solid fa-shield-halved"></i>
+            <h3>Reliable by design</h3>
+            <p>Standardized resources, explicit configuration, and predictable infrastructure reduce configuration drift and troubleshooting time.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="architecture" style="background: linear-gradient(180deg, #f7fbff 0%, #edf5ff 100%);">
+      <div class="container">
+        <div class="section-head">
+          <span class="tag">Architecture</span>
+          <h2>How the solution is structured</h2>
+        </div>
+
+        <div class="split">
+          <div class="panel">
+            <h3 style="margin-top:0; font-size: 1.5rem;">Core architecture</h3>
+            <ul>
+              <li>Git repository stores the source of truth for infrastructure definitions.</li>
+              <li>Terraform defines cloud resources and environment configuration.</li>
+              <li>AWS hosts the provisioned virtual infrastructure.</li>
+              <li>Docker can be used to serve or run the project interface and deployment layer.</li>
+              <li>Operations remain auditable, scalable, and easy to reproduce.</li>
             </ul>
-        </div>
-    </nav>
+          </div>
 
-    <!-- Hero Section -->
-    <section id="home" class="hero">
-        <div class="hero-content">
-            <div class="hero-badge">Infrastructure as Code</div>
-            <h1>TeleNetResolve IaC</h1>
-            <div class="hero-subtitle">AI-Powered Telecom Network Issue Resolution</div>
-            <p>Automate infrastructure provisioning for telecom systems to solve customer network queries instantly. Deploy scalable environments with Terraform & Ansible in minutes - zero manual errors, 100% reproducibility.</p>
-            <div class="cta-buttons">
-                <a href="#features" class="cta-primary">View Features</a>
-                <a href="#solution" class="cta-secondary">See Solution</a>
+          <div class="panel">
+            <h3 style="margin-top:0; font-size: 1.5rem;">Deployment model</h3>
+            <div class="flow">
+              <div class="step">
+                <div class="step-number">1</div>
+                <h3>Define</h3>
+                <p>Infrastructure is declared as code.</p>
+              </div>
+              <div class="step">
+                <div class="step-number">2</div>
+                <h3>Validate</h3>
+                <p>Configuration is reviewed and checked.</p>
+              </div>
+              <div class="step">
+                <div class="step-number">3</div>
+                <h3>Deploy</h3>
+                <p>Terraform creates the target environment.</p>
+              </div>
+              <div class="step">
+                <div class="step-number">4</div>
+                <h3>Operate</h3>
+                <p>Resources are maintained with updates and rollback.</p>
+              </div>
             </div>
+          </div>
         </div>
+      </div>
     </section>
 
-    <!-- Features Section -->
-    <section id="features" class="section">
-        <h2 class="section-title animate-on-scroll">Core Capabilities</h2>
-        <p class="section-subtitle animate-on-scroll">Resolve telecom network issues with automated, scalable infrastructure deployment</p>
-        <div class="features-grid">
-            <div class="feature-card animate-on-scroll">
-                <div class="feature-icon">
-                    <i class="fas fa-robot"></i>
-                </div>
-                <h3>AI-Driven Diagnostics</h3>
-                <p>Automated network issue detection and resolution environments provisioned instantly for customer query handling.</p>
-            </div>
-            <div class="feature-card animate-on-scroll">
-                <div class="feature-icon">
-                    <i class="fas fa-cloud"></i>
-                </div>
-                <h3>Multi-Cloud Deployment</h3>
-                <p>Deploy on AWS, Azure, or local Docker with identical IaC configurations. One code, multiple platforms.</p>
-            </div>
-            <div class="feature-card animate-on-scroll">
-                <div class="feature-icon">
-                    <i class="fas fa-bolt"></i>
-                </div>
-                <h3>Instant Environment Spin-up</h3>
-                <p>Provision complete diagnostic environments in under 2 minutes. Handle peak query volumes effortlessly.</p>
-            </div>
-            <div class="feature-card animate-on-scroll">
-                <div class="feature-icon">
-                    <i class="fas fa-cubes"></i>
-                </div>
-                <h3>Terraform & Ansible Automation</h3>
-                <p>Self-installing IaC toolchains with zero manual setup. Complete dependency automation included.</p>
-            </div>
-            <div class="feature-card animate-on-scroll">
-                <div class="feature-icon">
-                    <i class="fas fa-shield-alt"></i>
-                </div>
-                <h3>Immutable Infrastructure</h3>
-                <p>Guaranteed consistency across dev/test/prod. No configuration drift, perfect reproducibility.</p>
-            </div>
-            <div class="feature-card animate-on-scroll">
-                <div class="feature-icon">
-                    <i class="fas fa-sync-alt"></i>
-                </div>
-                <h3>CI/CD Pipeline Integration</h3>
-                <p>Git-triggered infrastructure deployments. Automatic updates and rollbacks with zero downtime.</p>
-            </div>
+    <section id="workflow">
+      <div class="container">
+        <div class="section-head">
+          <span class="tag">Workflow</span>
+          <h2>Operational flow</h2>
+          <p>
+            The platform is designed to move from definition to deployment with minimal friction and clearer operational visibility.
+          </p>
         </div>
+
+        <div class="flow" style="grid-template-columns: repeat(4, minmax(0,1fr));">
+          <div class="step">
+            <div class="step-number">01</div>
+            <h3>Prepare</h3>
+            <p>Choose target region, instance sizing, and access rules.</p>
+          </div>
+          <div class="step">
+            <div class="step-number">02</div>
+            <h3>Apply</h3>
+            <p>Use Terraform to create the required infrastructure.</p>
+          </div>
+          <div class="step">
+            <div class="step-number">03</div>
+            <h3>Run</h3>
+            <p>Start workloads, containers, or services on top of the provisioned environment.</p>
+          </div>
+          <div class="step">
+            <div class="step-number">04</div>
+            <h3>Monitor</h3>
+            <p>Track, update, and adjust infrastructure as operational needs evolve.</p>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <!-- Problem-Solution Section -->
-    <section id="solution" class="problem-solution">
-        <div class="section">
-            <h2 class="section-title" style="background: linear-gradient(45deg, #ef4444, #00d4ff); margin-bottom: 1rem;">Before & After</h2>
-            <p class="section-subtitle" style="color: #64748b;">Traditional manual setup vs TeleNetResolve IaC automation</p>
-            <div class="ps-grid">
-                <div class="ps-card problem-card animate-on-scroll">
-                    <div style="font-size: 5rem; color: #ef4444; margin-bottom: 2rem;">
-                        <i class="fas fa-exclamation-triangle"></i>
-                    </div>
-                    <h3 style="color: #dc2626; margin-bottom: 1.5rem;">Manual Network Troubleshooting</h3>
-                    <ul style="text-align: left; color: #64748b;">
-                        <li>⏳ 4-6 hours per environment setup</li>
-                        <li>❌ 35% configuration errors</li>
-                        <li>🔄 Manual dependency installation</li>
-                        <li>⚠️ Environment inconsistencies</li>
-                        <li>📉 Slow customer query resolution</li>
-                    </ul>
-                </div>
-                <div class="ps-card solution-card animate-on-scroll">
-                    <div style="font-size: 5rem; color: #00d4ff; margin-bottom: 2rem;">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <h3 style="color: #00d4ff; margin-bottom: 1.5rem;">TeleNetResolve IaC</h3>
-                    <ul style="text-align: left; color: #475569;">
-                        <li>⚡ <strong>2 minutes</strong> environment ready</li>
-                        <li>✅ <strong>0% errors</strong> guaranteed</li>
-                        <li>🤖 Auto IaC toolchain setup</li>
-                        <li>🔄 <strong>100% consistency</strong></li>
-                        <li>🚀 <strong>95% faster</strong> resolution</li>
-                    </ul>
-                </div>
-            </div>
+    <section id="stack" style="background: linear-gradient(180deg, #f8fafc 0%, #edf6ff 100%);">
+      <div class="container">
+        <div class="section-head">
+          <span class="tag">Stack</span>
+          <h2>Technology used</h2>
+          <p>Selected for reliability, modern tooling, and ease of adoption in telecom and cloud automation workflows.</p>
         </div>
+
+        <div class="stack-grid">
+          <div class="stack-item"><i class="fa-brands fa-aws"></i><span>AWS</span></div>
+          <div class="stack-item"><i class="fa-solid fa-cubes"></i><span>Terraform</span></div>
+          <div class="stack-item"><i class="fa-brands fa-docker"></i><span>Docker</span></div>
+          <div class="stack-item"><i class="fa-brands fa-github"></i><span>GitHub</span></div>
+          <div class="stack-item"><i class="fa-solid fa-server"></i><span>EC2</span></div>
+        </div>
+      </div>
     </section>
 
-    <!-- Stats Section -->
-    <section class="stats section">
-        <h2 class="section-title" style="color: white;">Proven Results</h2>
-        <div class="stats-grid">
-            <div class="stat-item animate-on-scroll">
-                <h3 data-count="95">95</h3>
-                <p>Faster Resolution</p>
-            </div>
-            <div class="stat-item animate-on-scroll">
-                <h3 data-count="100">100</h3>
-                <p>Automation</p>
-            </div>
-            <div class="stat-item animate-on-scroll">
-                <h3 data-count="0">0</h3>
-                <p>Manual Errors</p>
-            </div>
-            <div class="stat-item animate-on-scroll">
-                <h3 data-count="120">120</h3>
-                <p>X Query Capacity</p>
-            </div>
+    <section id="deploy" class="cta-band">
+      <div class="container">
+        <div class="cta-box">
+          <h2>Run this project locally</h2>
+          <p>
+            Docker makes it easy to serve the project quickly, while Terraform provides the infrastructure provisioning layer for AWS cloud deployment.
+          </p>
+          <div class="hero-actions" style="justify-content: center; margin-bottom: 0;">
+            <a href="#top" class="btn btn-primary">Back to top</a>
+            <a href="https://github.com/mohddilshadkhan2003/-IaC-Provisioning-for-Telecomm-System" class="btn btn-secondary">View repository</a>
+          </div>
         </div>
+      </div>
     </section>
+  </main>
 
-    <!-- Team Section -->
-    <section id="team" class="section">
-        <h2 class="section-title animate-on-scroll">Engineering Team</h2>
-        <p class="section-subtitle animate-on-scroll">DevOps experts building the future of telecom infrastructure</p>
-        <div class="team-grid">
-            <div class="team-card animate-on-scroll">
-                <div class="team-id">EN22CS301602</div>
-                <h3>Mohd Dilshad Khan</h3>
-                <p class="team-role">Lead DevOps Architect</p>
-            </div>
-            <div class="team-card animate-on-scroll">
-                <div class="team-id">EN22CS301683</div>
-                <h3>Paridhi Gupta</h3>
-                <p class="team-role">Cloud Infrastructure Engineer</p>
-            </div>
-            <div class="team-card animate-on-scroll">
-                <div class="team-id">EN22CS301658</div>
-                <h3>Nishit Sharma</h3>
-                <p class="team-role">Automation Specialist</p>
-            </div>
-            <div class="team-card animate-on-scroll">
-                <div class="team-id">EN22CS301604</div>
-                <h3>Mohd Suhail Khan</h3>
-                <p class="team-role">CI/CD Pipeline Engineer</p>
-            </div>
-            <div class="team-card animate-on-scroll">
-                <div class="team-id">EN22CS301656</div>
-                <h3>Nirmal Kant Shrivastava</h3>
-                <p class="team-role">IaC Framework Developer</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Tech Stack -->
-    <section id="tech" class="tech-stack section">
-        <h2 class="section-title animate-on-scroll">Technology Stack</h2>
-        <p class="section-subtitle animate-on-scroll">Built with enterprise-grade tools for maximum reliability</p>
-        <div class="tech-grid">
-            <div class="tech-item animate-on-scroll">
-                <i class="fab fa-docker"></i>
-                <div style="margin-top: 0.5rem; font-size: 0.8rem; font-weight: 600;">Docker</div>
-            </div>
-            <div class="tech-item animate-on-scroll">
-                <i class="fab fa-aws"></i>
-                <div style="margin-top: 0.5rem; font-size: 0.8rem; font-weight: 600;">AWS</div>
-            </div>
-            <div class="tech-item animate-on-scroll">
-                <i class="fas fa-cubes"></i>
-                <div style="margin-top: 0.5rem; font-size: 0.8rem; font-weight: 600;">Terraform</div>
-            </div>
-            <div class="tech-item animate-on-scroll">
-                <i class="fas fa-play-circle"></i>
-                <div style="margin-top: 0.5rem; font-size: 0.8rem; font-weight: 600;">Ansible</div>
-            </div>
-            <div class="tech-item animate-on-scroll">
-                <i class="fab fa-git-alt"></i>
-                <div style="margin-top: 0.5rem; font-size: 0.8rem; font-weight: 600;">Git</div>
-            </div>
-            <div class="tech-item animate-on-scroll">
-                <i class="fab fa-github"></i>
-                <div style="margin-top: 0.5rem; font-size: 0.8rem; font-weight: 600;">GitHub</div>
-            </div>
-            <div class="tech-item animate-on-scroll">
-                <i class="fas fa-server"></i>
-                <div style="margin-top: 0.5rem; font-size: 0.8rem; font-weight: 600;">EC2</div>
-            </div>
-            <div class="tech-item animate-on-scroll">
-                <i class="fas fa-database"></i>
-                <div style="margin-top: 0.5rem; font-size: 0.8rem; font-weight: 600;">RDS</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Final CTA -->
-    <section style="background: linear-gradient(135deg, #00d4ff, #667eea); color: white; text-align: center; padding: 120px 0;">
-        <div class="section" style="max-width: 800px;">
-            <h2 style="font-size: 3.2rem; margin-bottom: 1.5rem; font-weight: 800;">Transform Network Issue Resolution Today</h2>
-            <p style="font-size: 1.4rem; margin-bottom: 3rem; opacity: 0.95;">Deploy TeleNetResolve IaC and resolve customer queries 95% faster with zero configuration errors.</p>
-            <div style="display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap;">
-                <a href="#" class="cta-primary" style="background: white; color: #00d4ff; padding: 1.3rem 3.5rem; font-size: 1.2rem;">Start Free Trial</a>
-                <a href="#features" class="cta-secondary" style="border-color: white; padding: 1.3rem 3.5rem; font-size: 1.2rem;">View Demo</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="section">
-            <h3 style="font-size: 2.2rem; margin-bottom: 1.5rem;">
-                <i class="fas fa-network-wired"></i> TeleNetResolve IaC
-            </h3>
-            <p style="margin-bottom: 2.5rem; opacity: 0.8; max-width: 600px; margin-left: auto; margin-right: auto;">
-                Revolutionizing telecom network issue resolution through Infrastructure as Code. 
-                Deploy, diagnose, resolve - all automated.
-            </p>
-            <div style="display: flex; justify-content: center; gap: 2.5rem; margin-bottom: 3rem; font-size: 1.5rem;">
-                <a href="#" style="color: #00d4ff; transition: all 0.3s ease;"><i class="fab fa-github"></i></a>
-                <a href="#" style="color: #00d4ff; transition: all 0.3s ease;"><i class="fab fa-linkedin"></i></a>
-                <a href="#" style="color: #00d4ff; transition: all 0.3s ease;"><i class="fab fa-twitter"></i></a>
-                <a href="#" style="color: #00d4ff; transition: all 0.3s ease;"><i class="fas fa-envelope"></i></a>
-            </div>
-            <p style="opacity: 0.6; font-size: 0.9rem;">© 2024 TeleNetResolve Team. EN22CS Batch. All rights reserved. | DevOps Excellence</p>
-        </div>
-    </footer>
-
-    <script>
-        // Smooth scrolling
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
-        });
-
-        // Navbar scroll effect
-        window.addEventListener('scroll', () => {
-            const navbar = document.querySelector('.navbar');
-            if (window.scrollY > 100) {
-                navbar.style.background = 'rgba(255, 255, 255, 0.98)';
-                navbar.style.boxShadow = '0 5px 30px rgba(0,0,0,0.1)';
-            } else {
-                navbar.style.background = 'rgba(255, 255, 255, 0.95)';
-                navbar.style.boxShadow = '0 2px 20px rgba(0,0,0,0.05)';
-            }
-        });
-
-        // Scroll animations
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('animated');
-                }
-            });
-        }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
-
-        document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
-
-        // Stats counter animation
-        function animateCounters() {
-            const counters = document.querySelectorAll('.stat-item h3');
-            counters.forEach(counter => {
-                const target = parseInt(counter.textContent);
-                const count = +counter.getAttribute('data-count') || target;
-                const increment = count / 100;
-                let current = 0;
-                
-                const updateCounter = () => {
-                    if (current < count) {
-                        current += increment;
-                        counter.textContent = Math.ceil(current);
-                        requestAnimationFrame(updateCounter);
-                    } else {
-                        counter.textContent = count + '%';
-                    }
-                };
-                
-                if (counter.closest('.stats').getBoundingClientRect().top < window.innerHeight) {
-                    updateCounter();
-                }
-            });
-        }
-
-        window.addEventListener('scroll', animateCounters);
-
-        // Parallax hero
-        window.addEventListener('scroll', () => {
-            const scrolled = window.pageYOffset;
-            const hero = document.querySelector('.hero');
-            hero.style.transform = `translateY(${scrolled * 0.3}px)`;
-        });
-
-        // Create floating network nodes
-        function createNetworkNodes() {
-            const hero = document.querySelector('.hero');
-            for (let i = 0; i < 30; i++) {
-                const node = document.createElement('div');
-                node.style.cssText = `
-                    position: absolute;
-                    width: ${3 + Math.random() * 4}px;
-                    height: ${3 + Math.random() * 4}px;
-                    background: rgba(0, 212, 255, ${0.6 + Math.random() * 0.4});
-                    border-radius: 50%;
-                    left: ${Math.random() * 100}%;
-                    top: ${Math.random() * 100}%;
-                    animation: networkFloat ${8 + Math.random() * 12}s linear infinite;
-                    animation-delay: ${Math.random() * 8}s;
-                    box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
-                `;
-                hero.appendChild(node);
-            }
-        }
-
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes networkFloat {
-                0% { 
-                    transform: translateY(100vh) translateX(0px) rotate(0deg); 
-                    opacity: 0; 
-                }
-                10% { opacity: 1; }
-                90% { opacity: 1; }
-                100% { 
-                    transform: translateY(-100vh) translateX(100px) rotate(360deg); 
-                    opacity: 0; 
-                }
-            }
-        `;
-        document.head.appendChild(style);
-
-        window.addEventListener('load', () => {
-            createNetworkNodes();
-        });
-
-        // Tech stack stagger animation
-        window.addEventListener('load', () => {
-            const techItems = document.querySelectorAll('.tech-item');
-            techItems.forEach((item, index) => {
-                item.style.transitionDelay = `${index * 0.1}s`;
-            });
-        });
-    </script>
+  <footer>
+    <div class="container footer-inner">
+      <div>
+        <strong style="color: white; font-size: 1.1rem;">Dilshad Telecom IaC</strong>
+        <div style="margin-top: 8px;">Modern infrastructure automation for telecom systems.</div>
+      </div>
+      <div class="socials" aria-label="Social links">
+        <a href="https://github.com/mohddilshadkhan2003" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+        <a href="#top" aria-label="Home"><i class="fa-solid fa-house"></i></a>
+        <a href="#deploy" aria-label="Deploy"><i class="fa-solid fa-rocket"></i></a>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>

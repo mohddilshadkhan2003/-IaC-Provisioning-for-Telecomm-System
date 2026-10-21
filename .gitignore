@@ -1,0 +1,17 @@
+# Terraform state files
+*.tfstate
+*.tfstate.*
+
+# Terraform cache and local config
+.terraform/
+.terraform.lock.hcl
+
+# Local editor files
+.vscode/
+.DS_Store
+
+# Logs
+*.log
+
+# OS-specific generated files
+Thumbs.db

@@ -1,856 +1,949 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dilshad Telecom IaC | Automated Provisioning</title>
-  <meta name="description" content="Telecom infrastructure provisioning and automation platform built with Terraform, Docker, and AWS-ready IaC patterns." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-  <style>
-    :root {
-      --bg: #07111f;
-      --bg-soft: #0d1b2a;
-      --panel: rgba(15, 23, 42, 0.8);
-      --card: #ffffff;
-      --card-soft: #f4f8ff;
-      --text: #0f172a;
-      --text-light: #475569;
-      --primary: #14b8ff;
-      --primary-strong: #2563eb;
-      --secondary: #18c6a3;
-      --accent: #f59e0b;
-      --border: rgba(148, 163, 184, 0.2);
-      --shadow: 0 25px 60px rgba(15, 23, 42, 0.18);
-      --max: 1180px;
-    }
-
-    * { box-sizing: border-box; }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(180deg, #07111f 0%, #0b1324 100%);
-      color: var(--text);
-      line-height: 1.6;
-    }
-
-    a { text-decoration: none; }
-    img { max-width: 100%; display: block; }
-
-    .container {
-      width: min(var(--max), calc(100% - 32px));
-      margin: 0 auto;
-    }
-
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 30;
-      backdrop-filter: blur(12px);
-      background: rgba(7, 17, 31, 0.7);
-      border-bottom: 1px solid rgba(148, 163, 184, 0.18);
-    }
-
-    .nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      min-height: 78px;
-      gap: 24px;
-    }
-
-    .brand {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 800;
-      letter-spacing: 0.02em;
-      color: white;
-      font-size: 1.1rem;
-    }
-
-    .brand-mark {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      display: grid;
-      place-items: center;
-      background: linear-gradient(135deg, var(--primary), var(--primary-strong));
-      box-shadow: 0 10px 26px rgba(37, 99, 235, 0.35);
-    }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 28px;
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .nav-links a {
-      color: rgba(255,255,255,0.72);
-      font-size: 0.95rem;
-      transition: color 0.2s ease;
-    }
-
-    .nav-links a:hover {
-      color: #fff;
-    }
-
-    .nav-cta {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.88rem 1.4rem;
-      border-radius: 999px;
-      background: linear-gradient(135deg, var(--primary), var(--primary-strong));
-      color: white;
-      font-weight: 700;
-      box-shadow: 0 14px 30px rgba(20, 184, 255, 0.28);
-    }
-
-    .hero {
-      position: relative;
-      padding: 92px 0 68px;
-      overflow: hidden;
-      background: linear-gradient(180deg, rgba(7, 17, 31, 0.93), rgba(11, 19, 36, 0.96));
-    }
-
-    .hero::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(circle at 15% 22%, rgba(20,184,255,0.18), transparent 26%),
-        radial-gradient(circle at 88% 20%, rgba(18,198,163,0.12), transparent 24%),
-        linear-gradient(135deg, rgba(20,184,255,0.08), transparent 45%);
-      pointer-events: none;
-    }
-
-    .hero-grid {
-      position: relative;
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 42px;
-      align-items: center;
-      z-index: 1;
-    }
-
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: rgba(20,184,255,0.12);
-      border: 1px solid rgba(20,184,255,0.28);
-      color: #9fe8ff;
-      padding: 0.5rem 0.9rem;
-      border-radius: 999px;
-      font-size: 0.82rem;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-
-    h1 {
-      margin: 18px 0 18px;
-      font-size: clamp(2.8rem, 4vw, 5rem);
-      line-height: 1.05;
-      color: #f8fcff;
-      letter-spacing: -0.06em;
-    }
-
-    .hero h1 .gradient {
-      background: linear-gradient(135deg, #dff7ff 0%, var(--primary) 30%, #8de7ff 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .hero-copy {
-      color: rgba(226, 232, 240, 0.8);
-      font-size: 1.12rem;
-      max-width: 670px;
-      margin-bottom: 28px;
-    }
-
-    .hero-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      margin-bottom: 28px;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem 1.5rem;
-      border-radius: 999px;
-      font-weight: 700;
-      font-size: 0.97rem;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .btn:hover {
-      transform: translateY(-2px);
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary), var(--primary-strong));
-      color: white;
-      box-shadow: 0 18px 32px rgba(20,184,255,0.24);
-    }
-
-    .btn-secondary {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(148,163,184,0.28);
-      color: white;
-    }
-
-    .mini-stats {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 18px;
-      margin-top: 20px;
-    }
-
-    .mini-stat {
-      min-width: 150px;
-      padding: 18px 16px;
-      border-radius: 18px;
-      background: rgba(15, 23, 42, 0.64);
-      border: 1px solid var(--border);
-      color: white;
-    }
-
-    .mini-stat strong {
-      display: block;
-      font-size: 1.43rem;
-      letter-spacing: -0.04em;
-    }
-
-    .mini-stat span {
-      color: rgba(226, 232, 240, 0.7);
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .dashboard {
-      position: relative;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(148,163,184,0.2);
-      border-radius: 28px;
-      box-shadow: var(--shadow);
-      padding: 24px;
-      backdrop-filter: blur(12px);
-    }
-
-    .device-window {
-      background: linear-gradient(180deg, rgba(15,23,42,0.96), rgba(15,23,42,0.84));
-      border-radius: 22px;
-      border: 1px solid rgba(148,163,184,0.22);
-      overflow: hidden;
-    }
-
-    .window-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 14px 18px;
-      border-bottom: 1px solid rgba(148,163,184,0.18);
-      background: rgba(15,23,42,0.92);
-    }
-
-    .dot {
-      width: 11px;
-      height: 11px;
-      border-radius: 50%;
-      display: inline-block;
-    }
-
-    .dot.red { background: #ff6b6b; }
-    .dot.yellow { background: #fbbf24; }
-    .dot.green { background: #34d399; }
-
-    .window-body {
-      padding: 22px;
-      background: linear-gradient(180deg, rgba(15,23,42,0.86), rgba(15,23,42,0.94));
-    }
-
-    .status-card {
-      background: rgba(20,184,255,0.08);
-      border: 1px solid rgba(20,184,255,0.25);
-      border-radius: 18px;
-      padding: 16px 18px;
-      margin-bottom: 18px;
-    }
-
-    .status-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      color: white;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .live {
-      background: rgba(52, 211, 153, 0.12);
-      color: #8af0c8;
-      border: 1px solid rgba(52,211,153,0.25);
-      border-radius: 999px;
-      padding: 0.3rem 0.7rem;
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .grid-cards {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    .mini-card {
-      background: rgba(148,163,184,0.04);
-      border: 1px solid rgba(148,163,184,0.18);
-      border-radius: 16px;
-      padding: 18px 16px;
-      color: white;
-    }
-
-    .mini-card .label {
-      color: rgba(226, 232, 240, 0.7);
-      font-size: 0.75rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-      display: block;
-    }
-
-    .mini-card strong {
-      font-size: 1.8rem;
-      letter-spacing: -0.06em;
-      display: block;
-    }
-
-    section {
-      padding: 88px 0;
-    }
-
-    .section-head {
-      text-align: center;
-      margin-bottom: 42px;
-    }
-
-    .section-head .tag {
-      display: inline-flex;
-      padding: 0.55rem 0.8rem;
-      border-radius: 999px;
-      font-size: 0.76rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      background: rgba(20,184,255,0.08);
-      border: 1px solid rgba(20,184,255,0.22);
-      color: var(--primary-strong);
-      font-weight: 700;
-    }
-
-    h2 {
-      font-size: clamp(2rem, 3vw, 3rem);
-      letter-spacing: -0.05em;
-      margin: 18px 0 12px;
-      color: var(--text);
-    }
-
-    .section-head p {
-      margin: 0 auto;
-      max-width: 720px;
-      color: var(--text-light);
-      font-size: 1.06rem;
-    }
-
-    .feature-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 24px;
-    }
-
-    .feature {
-      background: var(--card);
-      border: 1px solid rgba(148,163,184,0.18);
-      border-radius: 22px;
-      padding: 30px 22px;
-      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .feature:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 18px 34px rgba(37, 99, 235, 0.12);
-    }
-
-    .feature i {
-      width: 58px;
-      height: 58px;
-      border-radius: 16px;
-      display: grid;
-      place-items: center;
-      background: linear-gradient(135deg, rgba(20,184,255,0.12), rgba(37,99,235,0.1));
-      color: var(--primary-strong);
-      font-size: 1.5rem;
-      margin-bottom: 18px;
-    }
-
-    .feature h3 {
-      margin: 0 0 10px;
-      font-size: 1.3rem;
-      color: var(--text);
-    }
-
-    .feature p {
-      margin: 0;
-      color: var(--text-light);
-    }
-
-    .split {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 26px;
-      align-items: center;
-    }
-
-    .panel {
-      background: linear-gradient(180deg, #ffffff, #f8fbff);
-      border-radius: 26px;
-      border: 1px solid rgba(148,163,184,0.18);
-      padding: 28px;
-      box-shadow: var(--shadow);
-    }
-
-    .panel ul {
-      margin: 20px 0 0;
-      padding-left: 18px;
-      color: var(--text-light);
-    }
-
-    .panel li + li {
-      margin-top: 12px;
-    }
-
-    .flow {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0,1fr));
-      gap: 18px;
-      margin-top: 20px;
-    }
-
-    .step {
-      background: var(--card-soft);
-      border: 1px solid rgba(148,163,184,0.18);
-      border-radius: 18px;
-      padding: 20px 18px;
-    }
-
-    .step-number {
-      width: 42px;
-      height: 42px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, var(--primary), var(--primary-strong));
-      color: white;
-      display: grid;
-      place-items: center;
-      font-weight: 800;
-      margin-bottom: 14px;
-    }
-
-    .step h3 {
-      margin: 0 0 8px;
-      font-size: 1.08rem;
-    }
-
-    .step p {
-      margin: 0;
-      color: var(--text-light);
-      font-size: 0.94rem;
-    }
-
-    .stack-grid {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0,1fr));
-      gap: 18px;
-      margin-top: 28px;
-    }
-
-    .stack-item {
-      background: white;
-      border: 1px solid rgba(148,163,184,0.18);
-      border-radius: 18px;
-      padding: 20px 14px;
-      text-align: center;
-      transition: transform 0.2s ease;
-    }
-
-    .stack-item:hover { transform: translateY(-4px); }
-
-    .stack-item i {
-      font-size: 2.1rem;
-      color: var(--primary-strong);
-      margin-bottom: 10px;
-      display: block;
-    }
-
-    .stack-item span {
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    .cta-band {
-      padding: 72px 0 116px;
-      background: linear-gradient(135deg, #0b1230, #111b32 52%, #0f1f3f);
-      color: white;
-    }
-
-    .cta-box {
-      border: 1px solid rgba(148,163,184,0.18);
-      border-radius: 28px;
-      background: rgba(255,255,255,0.03);
-      padding: 40px 26px;
-      text-align: center;
-    }
-
-    .cta-box h2 {
-      color: white;
-      margin-bottom: 10px;
-    }
-
-    .cta-box p {
-      color: rgba(226,232,240,0.78);
-      max-width: 650px;
-      margin: 0 auto 26px;
-    }
-
-    footer {
-      background: #060d1a;
-      color: rgba(255,255,255,0.72);
-      border-top: 1px solid rgba(148,163,184,0.12);
-      padding: 30px 0 42px;
-    }
-
-    .footer-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    .socials {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      font-size: 1.1rem;
-    }
-
-    .socials a {
-      color: rgba(255,255,255,0.72);
-      width: 38px;
-      height: 38px;
-      display: grid;
-      place-items: center;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(148,163,184,0.18);
-    }
-
-    @media (max-width: 980px) {
-      .hero-grid,
-      .split,
-      .feature-grid,
-      .stack-grid,
-      .flow {
-        grid-template-columns: 1fr 1fr;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dilshad Telecom IaC | Automated Provisioning</title>
+    <meta
+      name="description"
+      content="Telecom infrastructure provisioning and automation platform built with Terraform, Docker, and AWS-ready IaC patterns."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+    <style>
+      :root {
+        --bg: #07111f;
+        --bg-soft: #0d1b2a;
+        --panel: rgba(15, 23, 42, 0.8);
+        --card: #ffffff;
+        --card-soft: #f4f8ff;
+        --text: #0f172a;
+        --text-light: #475569;
+        --primary: #14b8ff;
+        --primary-strong: #2563eb;
+        --secondary: #18c6a3;
+        --accent: #f59e0b;
+        --border: rgba(148, 163, 184, 0.2);
+        --shadow: 0 25px 60px rgba(15, 23, 42, 0.18);
+        --max: 1180px;
       }
 
-      .hero-grid { grid-template-columns: 1fr; }
-    }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        font-family: "Inter", sans-serif;
+        background: linear-gradient(180deg, #07111f 0%, #0b1324 100%);
+        color: var(--text);
+        line-height: 1.6;
+      }
+      a { text-decoration: none; }
+      img { max-width: 100%; display: block; }
+      ul { margin: 0; padding: 0; list-style: none; }
 
-    @media (max-width: 760px) {
-      .nav-links { display: none; }
+      .container {
+        width: min(var(--max), calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        backdrop-filter: blur(12px);
+        background: rgba(7, 17, 31, 0.7);
+        border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 78px;
+        gap: 24px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+        color: #fff;
+        font-size: 1.08rem;
+      }
+
+      .brand-mark {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+        box-shadow: 0 10px 26px rgba(37, 99, 235, 0.35);
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 28px;
+      }
+
+      .nav-links a {
+        color: rgba(255,255,255,0.72);
+        font-size: 0.95rem;
+        transition: color 0.2s ease;
+      }
+
+      .nav-links a:hover { color: #fff; }
+
+      .nav-cta,
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.9rem 1.5rem;
+        border-radius: 999px;
+        font-weight: 700;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .btn:hover,
+      .nav-cta:hover { transform: translateY(-2px); }
+
+      .nav-cta,
+      .btn-primary {
+        background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+        color: #fff;
+        box-shadow: 0 18px 32px rgba(20, 184, 255, 0.24);
+      }
+
+      .btn-secondary {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(148, 163, 184, 0.28);
+        color: #fff;
+      }
+
+      .hero {
+        position: relative;
+        padding: 90px 0 70px;
+        overflow: hidden;
+        background: linear-gradient(180deg, rgba(7, 17, 31, 0.95), rgba(11, 19, 36, 0.96));
+      }
+
+      .hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(circle at 15% 22%, rgba(20,184,255,0.18), transparent 26%),
+          radial-gradient(circle at 88% 20%, rgba(18,198,163,0.12), transparent 24%),
+          linear-gradient(135deg, rgba(20,184,255,0.08), transparent 45%);
+        pointer-events: none;
+      }
+
+      .hero-grid {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1.08fr 0.92fr;
+        gap: 42px;
+        align-items: center;
+        z-index: 1;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(20,184,255,0.12);
+        border: 1px solid rgba(20,184,255,0.28);
+        color: #9fe8ff;
+        padding: 0.55rem 0.9rem;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 18px 0 18px;
+        font-size: clamp(2.8rem, 4vw, 5rem);
+        line-height: 1.04;
+        color: #f8fcff;
+        letter-spacing: -0.06em;
+      }
+
+      .gradient {
+        background: linear-gradient(135deg, #dff7ff 0%, var(--primary) 30%, #8de7ff 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .hero-copy {
+        color: rgba(226,232,240,0.8);
+        font-size: 1.12rem;
+        max-width: 670px;
+        margin-bottom: 30px;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 30px;
+      }
+
+      .mini-stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px;
+      }
+
+      .mini-stat {
+        min-width: 150px;
+        padding: 18px 16px;
+        border-radius: 18px;
+        background: rgba(15,23,42,0.64);
+        border: 1px solid var(--border);
+        color: #fff;
+      }
+
+      .mini-stat strong {
+        display: block;
+        font-size: 1.5rem;
+        letter-spacing: -0.04em;
+      }
+
+      .mini-stat span {
+        color: rgba(226,232,240,0.7);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .dashboard {
+        position: relative;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(148,163,184,0.2);
+        border-radius: 28px;
+        box-shadow: var(--shadow);
+        padding: 24px;
+        backdrop-filter: blur(12px);
+      }
+
+      .device-window {
+        background: linear-gradient(180deg, rgba(15,23,42,0.96), rgba(15,23,42,0.84));
+        border-radius: 22px;
+        border: 1px solid rgba(148,163,184,0.22);
+        overflow: hidden;
+      }
+
+      .window-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 14px 18px;
+        border-bottom: 1px solid rgba(148,163,184,0.18);
+        background: rgba(15,23,42,0.92);
+      }
+
+      .dot {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+
+      .dot.red { background: #ff6b6b; }
+      .dot.yellow { background: #fbbf24; }
+      .dot.green { background: #34d399; }
+
+      .window-body {
+        padding: 22px;
+        background: linear-gradient(180deg, rgba(15,23,42,0.86), rgba(15,23,42,0.94));
+      }
+
+      .status-card {
+        background: rgba(20,184,255,0.08);
+        border: 1px solid rgba(20,184,255,0.25);
+        border-radius: 18px;
+        padding: 16px 18px;
+        margin-bottom: 18px;
+      }
+
+      .status-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: white;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+
+      .live {
+        background: rgba(52,211,153,0.12);
+        color: #8af0c8;
+        border: 1px solid rgba(52,211,153,0.25);
+        border-radius: 999px;
+        padding: 0.32rem 0.7rem;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .grid-cards {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0,1fr));
+        gap: 16px;
+      }
+
+      .mini-card {
+        background: rgba(148,163,184,0.04);
+        border: 1px solid rgba(148,163,184,0.18);
+        border-radius: 16px;
+        padding: 18px 16px;
+        color: white;
+      }
+
+      .mini-card .label {
+        color: rgba(226,232,240,0.7);
+        font-size: 0.75rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+        display: block;
+      }
+
+      .mini-card strong {
+        font-size: 1.7rem;
+        letter-spacing: -0.06em;
+        display: block;
+      }
+
+      section { padding: 88px 0; }
+
+      .section-head {
+        text-align: center;
+        margin-bottom: 42px;
+      }
+
+      .section-head .tag {
+        display: inline-flex;
+        padding: 0.55rem 0.8rem;
+        border-radius: 999px;
+        font-size: 0.76rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        background: rgba(20,184,255,0.08);
+        border: 1px solid rgba(20,184,255,0.22);
+        color: var(--primary-strong);
+        font-weight: 700;
+      }
+
+      h2 {
+        font-size: clamp(2rem, 3vw, 3rem);
+        letter-spacing: -0.05em;
+        margin: 18px 0 12px;
+        color: var(--text);
+      }
+
+      .section-head p {
+        margin: 0 auto;
+        max-width: 720px;
+        color: var(--text-light);
+        font-size: 1.06rem;
+      }
+
       .feature-grid,
-      .split,
+      .value-grid,
       .stack-grid,
-      .flow,
-      .grid-cards { grid-template-columns: 1fr; }
+      .flow {
+        display: grid;
+        gap: 24px;
+      }
 
-      .nav { min-height: 70px; }
-      .hero { padding-top: 60px; }
-      h1 { font-size: 2.7rem; }
-      .brand { font-size: 1rem; }
-      .nav-cta { display: none; }
-    }
-  </style>
-</head>
-<body>
-  <header class="topbar">
-    <div class="container nav">
-      <a href="#top" class="brand" aria-label="Dilshad Telecom IaC home">
-        <span class="brand-mark"><i class="fa-solid fa-network-wired"></i></span>
-        <span>Dilshad Telecom IaC</span>
-      </a>
+      .feature-grid { grid-template-columns: repeat(3, minmax(0,1fr)); }
+      .value-grid { grid-template-columns: repeat(4, minmax(0,1fr)); }
+      .stack-grid { grid-template-columns: repeat(5, minmax(0,1fr)); }
+      .flow { grid-template-columns: repeat(4, minmax(0,1fr)); }
 
-      <ul class="nav-links">
-        <li><a href="#overview">Overview</a></li>
-        <li><a href="#architecture">Architecture</a></li>
-        <li><a href="#workflow">Workflow</a></li>
-        <li><a href="#stack">Stack</a></li>
-      </ul>
+      .feature,
+      .value-card,
+      .stack-item,
+      .step,
+      .kpi-card,
+      .panel {
+        background: var(--card);
+        border: 1px solid rgba(148,163,184,0.18);
+        border-radius: 22px;
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+      }
 
-      <a href="#deploy" class="nav-cta">Launch Demo</a>
-    </div>
-  </header>
+      .feature,
+      .value-card,
+      .stack-item,
+      .step {
+        padding: 28px 22px;
+      }
 
-  <main id="top">
-    <section class="hero">
-      <div class="container hero-grid">
-        <div>
-          <div class="eyebrow"><i class="fa-solid fa-shield-heart"></i> Infrastructure as Code</div>
-          <h1>Build smarter <span class="gradient">telecom infrastructure</span> with automation.</h1>
-          <p class="hero-copy">
-            A modern IaC platform for telecom environments that reduces manual setup time, improves consistency,
-            and helps teams provision and operate infrastructure in a repeatable, resilient way.
-          </p>
+      .feature:hover,
+      .value-card:hover,
+      .stack-item:hover,
+      .step:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 18px 34px rgba(37, 99, 235, 0.12);
+      }
 
-          <div class="hero-actions">
-            <a href="#overview" class="btn btn-primary">Explore Solution</a>
-            <a href="#deploy" class="btn btn-secondary">Run Locally</a>
+      .feature i,
+      .value-card i,
+      .stack-item i {
+        width: 58px;
+        height: 58px;
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, rgba(20,184,255,0.12), rgba(37,99,235,0.1));
+        color: var(--primary-strong);
+        font-size: 1.5rem;
+        margin-bottom: 18px;
+      }
+
+      .feature h3,
+      .value-card h3,
+      .step h3 {
+        margin: 0 0 10px;
+        font-size: 1.26rem;
+        color: var(--text);
+      }
+
+      .feature p,
+      .value-card p,
+      .step p,
+      .panel p,
+      .panel li {
+        margin: 0;
+        color: var(--text-light);
+      }
+
+      .split {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 26px;
+        align-items: center;
+      }
+
+      .panel {
+        background: linear-gradient(180deg, #ffffff, #f8fbff);
+        padding: 28px;
+        box-shadow: var(--shadow);
+      }
+
+      .panel ul {
+        margin-top: 20px;
+        padding-left: 18px;
+      }
+
+      .panel li + li { margin-top: 12px; }
+
+      .step-number {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+        color: white;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        margin-bottom: 14px;
+      }
+
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0,1fr));
+        gap: 24px;
+        margin-top: 18px;
+      }
+
+      .kpi-card {
+        padding: 26px 20px;
+        text-align: center;
+      }
+
+      .kpi-card strong {
+        display: block;
+        font-size: clamp(2rem,3vw,3rem);
+        letter-spacing: -0.06em;
+        color: var(--primary-strong);
+      }
+
+      .kpi-card span {
+        color: var(--text-light);
+      }
+
+      .stack-item {
+        text-align: center;
+        transition: transform 0.2s ease;
+      }
+
+      .stack-item i {
+        margin: 0 auto 10px;
+      }
+
+      .stack-item span {
+        font-weight: 700;
+        color: var(--text);
+      }
+
+      .cta-band {
+        padding: 72px 0 116px;
+        background: linear-gradient(135deg, #0b1230, #111b32 52%, #0f1f3f);
+        color: white;
+      }
+
+      .cta-box {
+        border: 1px solid rgba(148,163,184,0.18);
+        border-radius: 28px;
+        background: rgba(255,255,255,0.03);
+        padding: 40px 26px;
+        text-align: center;
+      }
+
+      .cta-box h2 {
+        color: white;
+        margin-bottom: 10px;
+      }
+
+      .cta-box p {
+        color: rgba(226,232,240,0.78);
+        max-width: 650px;
+        margin: 0 auto 26px;
+      }
+
+      footer {
+        background: #060d1a;
+        color: rgba(255,255,255,0.72);
+        border-top: 1px solid rgba(148,163,184,0.12);
+        padding: 30px 0 42px;
+      }
+
+      .footer-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .socials {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-size: 1.1rem;
+      }
+
+      .socials a {
+        color: rgba(255,255,255,0.72);
+        width: 38px;
+        height: 38px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(148,163,184,0.18);
+      }
+
+      .reveal {
+        opacity: 0;
+        transform: translateY(18px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+      }
+
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      @media (max-width: 980px) {
+        .hero-grid,
+        .split,
+        .feature-grid,
+        .value-grid,
+        .stack-grid,
+        .flow,
+        .kpi-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .hero-grid { grid-template-columns: 1fr; }
+      }
+
+      @media (max-width: 760px) {
+        .nav-links { display: none; }
+        .feature-grid,
+        .value-grid,
+        .stack-grid,
+        .flow,
+        .kpi-grid,
+        .grid-cards,
+        .split { grid-template-columns: 1fr; }
+        .nav { min-height: 70px; }
+        .hero { padding-top: 60px; }
+        h1 { font-size: 2.7rem; }
+        .brand { font-size: 1rem; }
+        .nav-cta { display: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="container nav">
+        <a href="#top" class="brand" aria-label="Dilshad Telecom IaC home">
+          <span class="brand-mark"><i class="fa-solid fa-network-wired"></i></span>
+          <span>Dilshad Telecom IaC</span>
+        </a>
+
+        <ul class="nav-links">
+          <li><a href="#overview">Overview</a></li>
+          <li><a href="#architecture">Architecture</a></li>
+          <li><a href="#workflow">Workflow</a></li>
+          <li><a href="#stack">Stack</a></li>
+        </ul>
+
+        <a href="#deploy" class="nav-cta">Launch Demo</a>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="container hero-grid">
+          <div>
+            <div class="eyebrow"><i class="fa-solid fa-shield-heart"></i> Infrastructure as Code</div>
+            <h1>Build smarter <span class="gradient">telecom infrastructure</span> with automation.</h1>
+            <p class="hero-copy">
+              A modern IaC platform for telecom environments that reduces manual setup time, improves consistency,
+              and helps teams provision and operate infrastructure in a repeatable, resilient way.
+            </p>
+
+            <div class="hero-actions">
+              <a href="#overview" class="btn btn-primary">Explore Solution</a>
+              <a href="#deploy" class="btn btn-secondary">Run Locally</a>
+            </div>
+
+            <div class="mini-stats">
+              <div class="mini-stat">
+                <strong data-target="95">0</strong>
+                <span>Faster setup</span>
+              </div>
+              <div class="mini-stat">
+                <strong data-target="100">0</strong>
+                <span>Repeatable</span>
+              </div>
+              <div class="mini-stat">
+                <strong data-target="0">0</strong>
+                <span>Manual drift</span>
+              </div>
+            </div>
           </div>
 
-          <div class="mini-stats">
-            <div class="mini-stat">
+          <div class="dashboard" aria-label="Project dashboard preview">
+            <div class="device-window">
+              <div class="window-header">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+              </div>
+              <div class="window-body">
+                <div class="status-card">
+                  <div class="status-top">
+                    <span>Telecom Provisioning Status</span>
+                    <span class="live">Live</span>
+                  </div>
+                  <div style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Infrastructure automation pipeline active</div>
+                </div>
+
+                <div class="grid-cards">
+                  <div class="mini-card">
+                    <span class="label">Nodes</span>
+                    <strong>24</strong>
+                  </div>
+                  <div class="mini-card">
+                    <span class="label">Region</span>
+                    <strong>ap-south-1</strong>
+                  </div>
+                  <div class="mini-card">
+                    <span class="label">Downtime</span>
+                    <strong>0.2%</strong>
+                  </div>
+                  <div class="mini-card">
+                    <span class="label">Deploy</span>
+                    <strong>2 min</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="overview">
+        <div class="container">
+          <div class="section-head reveal">
+            <span class="tag">Overview</span>
+            <h2>Purpose-built for telecom operations</h2>
+            <p>
+              This project demonstrates how telecom systems can be provisioned programmatically with a secure,
+              repeatable, and scalable approach using modern IaC practices.
+            </p>
+          </div>
+
+          <div class="feature-grid reveal">
+            <article class="feature">
+              <i class="fa-solid fa-robot"></i>
+              <h3>Automation-first</h3>
+              <p>Reduce manual setup and eliminate repetitive infrastructure work across environments with codified deployment patterns.</p>
+            </article>
+
+            <article class="feature">
+              <i class="fa-solid fa-cloud"></i>
+              <h3>Cloud-ready</h3>
+              <p>Built around AWS provisioning patterns that can scale to telecom production workloads and multi-environment operations.</p>
+            </article>
+
+            <article class="feature">
+              <i class="fa-solid fa-shield-halved"></i>
+              <h3>Reliable by design</h3>
+              <p>Standardized resources, explicit configuration, and predictable infrastructure reduce configuration drift and troubleshooting time.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="architecture" style="background: linear-gradient(180deg, #f7fbff 0%, #edf5ff 100%);">
+        <div class="container">
+          <div class="section-head reveal">
+            <span class="tag">Architecture</span>
+            <h2>How the solution is structured</h2>
+          </div>
+
+          <div class="split reveal">
+            <div class="panel">
+              <h3 style="margin-top:0; font-size: 1.5rem;">Core architecture</h3>
+              <ul>
+                <li>Git repository stores the source of truth for infrastructure definitions.</li>
+                <li>Terraform defines cloud resources and environment configuration.</li>
+                <li>AWS hosts the provisioned virtual infrastructure.</li>
+                <li>Docker can be used to serve or run the project interface and deployment layer.</li>
+                <li>Operations remain auditable, scalable, and easy to reproduce.</li>
+              </ul>
+            </div>
+
+            <div class="panel">
+              <h3 style="margin-top:0; font-size: 1.5rem;">Deployment model</h3>
+              <div class="flow" style="grid-template-columns: repeat(2, minmax(0,1fr)); margin-top: 20px;">
+                <div class="step">
+                  <div class="step-number">1</div>
+                  <h3>Define</h3>
+                  <p>Infrastructure is declared as code.</p>
+                </div>
+                <div class="step">
+                  <div class="step-number">2</div>
+                  <h3>Validate</h3>
+                  <p>Configuration is reviewed and checked.</p>
+                </div>
+                <div class="step">
+                  <div class="step-number">3</div>
+                  <h3>Deploy</h3>
+                  <p>Terraform creates the target environment.</p>
+                </div>
+                <div class="step">
+                  <div class="step-number">4</div>
+                  <h3>Operate</h3>
+                  <p>Resources are maintained with updates and rollback.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="container">
+          <div class="section-head reveal">
+            <span class="tag">Impact</span>
+            <h2>Why this matters for telecom teams</h2>
+          </div>
+
+          <div class="value-grid reveal">
+            <article class="value-card">
+              <i class="fa-solid fa-bolt"></i>
+              <h3>Speed</h3>
+              <p>Provision infrastructure faster with automation instead of repetitive manual steps.</p>
+            </article>
+            <article class="value-card">
+              <i class="fa-solid fa-repeat"></i>
+              <h3>Consistency</h3>
+              <p>Standardize deployment patterns to reduce environment drift and setup variance.</p>
+            </article>
+            <article class="value-card">
+              <i class="fa-solid fa-lock"></i>
+              <h3>Security</h3>
+              <p>Define access rules and network boundaries in a controlled, versioned way.</p>
+            </article>
+            <article class="value-card">
+              <i class="fa-solid fa-chart-line"></i>
+              <h3>Scalability</h3>
+              <p>Build a reusable foundation that can expand across more services and regions.</p>
+            </article>
+          </div>
+
+          <div class="kpi-grid reveal">
+            <div class="kpi-card">
               <strong>95%</strong>
-              <span>Faster setup</span>
+              <span>Reduction in provisioning effort</span>
             </div>
-            <div class="mini-stat">
+            <div class="kpi-card">
+              <strong>24/7</strong>
+              <span>Operational continuity mindset</span>
+            </div>
+            <div class="kpi-card">
               <strong>100%</strong>
-              <span>Repeatable</span>
-            </div>
-            <div class="mini-stat">
-              <strong>0</strong>
-              <span>Manual drift</span>
+              <span>Repeatable infrastructure patterns</span>
             </div>
           </div>
         </div>
+      </section>
 
-        <div class="dashboard" aria-label="Project dashboard preview">
-          <div class="device-window">
-            <div class="window-header">
-              <span class="dot red"></span>
-              <span class="dot yellow"></span>
-              <span class="dot green"></span>
+      <section id="workflow" style="background: linear-gradient(180deg, #f8fafc 0%, #edf6ff 100%);">
+        <div class="container">
+          <div class="section-head reveal">
+            <span class="tag">Workflow</span>
+            <h2>Operational flow</h2>
+            <p>
+              The platform is designed to move from definition to deployment with minimal friction and clearer operational visibility.
+            </p>
+          </div>
+
+          <div class="flow reveal" style="grid-template-columns: repeat(4, minmax(0,1fr));">
+            <div class="step">
+              <div class="step-number">01</div>
+              <h3>Prepare</h3>
+              <p>Choose target region, instance sizing, and access rules.</p>
             </div>
-            <div class="window-body">
-              <div class="status-card">
-                <div class="status-top">
-                  <span>Telecom Provisioning Status</span>
-                  <span class="live">Live</span>
-                </div>
-                <div style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Infrastructure automation pipeline active</div>
-              </div>
-
-              <div class="grid-cards">
-                <div class="mini-card">
-                  <span class="label">Nodes</span>
-                  <strong>24</strong>
-                </div>
-                <div class="mini-card">
-                  <span class="label">Region</span>
-                  <strong>ap-south-1</strong>
-                </div>
-                <div class="mini-card">
-                  <span class="label">Downtime</span>
-                  <strong>0.2%</strong>
-                </div>
-                <div class="mini-card">
-                  <span class="label">Deploy</span>
-                  <strong>2 min</strong>
-                </div>
-              </div>
+            <div class="step">
+              <div class="step-number">02</div>
+              <h3>Apply</h3>
+              <p>Use Terraform to create the required infrastructure.</p>
+            </div>
+            <div class="step">
+              <div class="step-number">03</div>
+              <h3>Run</h3>
+              <p>Start workloads, containers, or services on top of the provisioned environment.</p>
+            </div>
+            <div class="step">
+              <div class="step-number">04</div>
+              <h3>Monitor</h3>
+              <p>Track, update, and adjust infrastructure as operational needs evolve.</p>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <section id="overview">
-      <div class="container">
-        <div class="section-head">
-          <span class="tag">Overview</span>
-          <h2>Purpose-built for telecom operations</h2>
-          <p>
-            This project demonstrates how telecom systems can be provisioned programmatically with a secure, repeatable, and scalable approach using modern IaC practices.
-          </p>
-        </div>
-
-        <div class="feature-grid">
-          <article class="feature">
-            <i class="fa-solid fa-robot"></i>
-            <h3>Automation-first</h3>
-            <p>Reduce manual setup and eliminate repetitive infrastructure work across environments with codified deployment patterns.</p>
-          </article>
-
-          <article class="feature">
-            <i class="fa-solid fa-cloud"></i>
-            <h3>Cloud-ready</h3>
-            <p>Built around AWS provisioning patterns that can scale to telecom production workloads and multi-environment operations.</p>
-          </article>
-
-          <article class="feature">
-            <i class="fa-solid fa-shield-halved"></i>
-            <h3>Reliable by design</h3>
-            <p>Standardized resources, explicit configuration, and predictable infrastructure reduce configuration drift and troubleshooting time.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="architecture" style="background: linear-gradient(180deg, #f7fbff 0%, #edf5ff 100%);">
-      <div class="container">
-        <div class="section-head">
-          <span class="tag">Architecture</span>
-          <h2>How the solution is structured</h2>
-        </div>
-
-        <div class="split">
-          <div class="panel">
-            <h3 style="margin-top:0; font-size: 1.5rem;">Core architecture</h3>
-            <ul>
-              <li>Git repository stores the source of truth for infrastructure definitions.</li>
-              <li>Terraform defines cloud resources and environment configuration.</li>
-              <li>AWS hosts the provisioned virtual infrastructure.</li>
-              <li>Docker can be used to serve or run the project interface and deployment layer.</li>
-              <li>Operations remain auditable, scalable, and easy to reproduce.</li>
-            </ul>
+      <section id="stack">
+        <div class="container">
+          <div class="section-head reveal">
+            <span class="tag">Stack</span>
+            <h2>Technology used</h2>
+            <p>Selected for reliability, modern tooling, and ease of adoption in telecom and cloud automation workflows.</p>
           </div>
 
-          <div class="panel">
-            <h3 style="margin-top:0; font-size: 1.5rem;">Deployment model</h3>
-            <div class="flow">
-              <div class="step">
-                <div class="step-number">1</div>
-                <h3>Define</h3>
-                <p>Infrastructure is declared as code.</p>
-              </div>
-              <div class="step">
-                <div class="step-number">2</div>
-                <h3>Validate</h3>
-                <p>Configuration is reviewed and checked.</p>
-              </div>
-              <div class="step">
-                <div class="step-number">3</div>
-                <h3>Deploy</h3>
-                <p>Terraform creates the target environment.</p>
-              </div>
-              <div class="step">
-                <div class="step-number">4</div>
-                <h3>Operate</h3>
-                <p>Resources are maintained with updates and rollback.</p>
-              </div>
+          <div class="stack-grid reveal">
+            <div class="stack-item"><i class="fa-brands fa-aws"></i><span>AWS</span></div>
+            <div class="stack-item"><i class="fa-solid fa-cubes"></i><span>Terraform</span></div>
+            <div class="stack-item"><i class="fa-brands fa-docker"></i><span>Docker</span></div>
+            <div class="stack-item"><i class="fa-brands fa-github"></i><span>GitHub</span></div>
+            <div class="stack-item"><i class="fa-solid fa-server"></i><span>EC2</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="deploy" class="cta-band">
+        <div class="container">
+          <div class="cta-box reveal">
+            <h2>Run this project locally</h2>
+            <p>
+              Docker makes it easy to serve the project quickly, while Terraform provides the infrastructure provisioning layer for AWS cloud deployment.
+            </p>
+            <div class="hero-actions" style="justify-content: center; margin-bottom: 0;">
+              <a href="#top" class="btn btn-primary">Back to top</a>
+              <a href="https://github.com/mohddilshadkhan2003/-IaC-Provisioning-for-Telecomm-System" class="btn btn-secondary">View repository</a>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </main>
 
-    <section id="workflow">
-      <div class="container">
-        <div class="section-head">
-          <span class="tag">Workflow</span>
-          <h2>Operational flow</h2>
-          <p>
-            The platform is designed to move from definition to deployment with minimal friction and clearer operational visibility.
-          </p>
+    <footer>
+      <div class="container footer-inner">
+        <div>
+          <strong style="color: white; font-size: 1.1rem;">Dilshad Telecom IaC</strong>
+          <div style="margin-top: 8px;">Modern infrastructure automation for telecom systems.</div>
         </div>
-
-        <div class="flow" style="grid-template-columns: repeat(4, minmax(0,1fr));">
-          <div class="step">
-            <div class="step-number">01</div>
-            <h3>Prepare</h3>
-            <p>Choose target region, instance sizing, and access rules.</p>
-          </div>
-          <div class="step">
-            <div class="step-number">02</div>
-            <h3>Apply</h3>
-            <p>Use Terraform to create the required infrastructure.</p>
-          </div>
-          <div class="step">
-            <div class="step-number">03</div>
-            <h3>Run</h3>
-            <p>Start workloads, containers, or services on top of the provisioned environment.</p>
-          </div>
-          <div class="step">
-            <div class="step-number">04</div>
-            <h3>Monitor</h3>
-            <p>Track, update, and adjust infrastructure as operational needs evolve.</p>
-          </div>
+        <div class="socials" aria-label="Social links">
+          <a href="https://github.com/mohddilshadkhan2003" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+          <a href="#top" aria-label="Home"><i class="fa-solid fa-house"></i></a>
+          <a href="#deploy" aria-label="Deploy"><i class="fa-solid fa-rocket"></i></a>
         </div>
       </div>
-    </section>
+    </footer>
 
-    <section id="stack" style="background: linear-gradient(180deg, #f8fafc 0%, #edf6ff 100%);">
-      <div class="container">
-        <div class="section-head">
-          <span class="tag">Stack</span>
-          <h2>Technology used</h2>
-          <p>Selected for reliability, modern tooling, and ease of adoption in telecom and cloud automation workflows.</p>
-        </div>
+    <script>
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("visible");
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.15 }
+      );
 
-        <div class="stack-grid">
-          <div class="stack-item"><i class="fa-brands fa-aws"></i><span>AWS</span></div>
-          <div class="stack-item"><i class="fa-solid fa-cubes"></i><span>Terraform</span></div>
-          <div class="stack-item"><i class="fa-brands fa-docker"></i><span>Docker</span></div>
-          <div class="stack-item"><i class="fa-brands fa-github"></i><span>GitHub</span></div>
-          <div class="stack-item"><i class="fa-solid fa-server"></i><span>EC2</span></div>
-        </div>
-      </div>
-    </section>
+      document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
 
-    <section id="deploy" class="cta-band">
-      <div class="container">
-        <div class="cta-box">
-          <h2>Run this project locally</h2>
-          <p>
-            Docker makes it easy to serve the project quickly, while Terraform provides the infrastructure provisioning layer for AWS cloud deployment.
-          </p>
-          <div class="hero-actions" style="justify-content: center; margin-bottom: 0;">
-            <a href="#top" class="btn btn-primary">Back to top</a>
-            <a href="https://github.com/mohddilshadkhan2003/-IaC-Provisioning-for-Telecomm-System" class="btn btn-secondary">View repository</a>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
+      const counters = document.querySelectorAll("[data-target]");
+      counters.forEach((counter) => {
+        const target = Number(counter.getAttribute("data-target"));
+        const suffix = target === 0 ? "" : "%";
+        let current = 0;
 
-  <footer>
-    <div class="container footer-inner">
-      <div>
-        <strong style="color: white; font-size: 1.1rem;">Dilshad Telecom IaC</strong>
-        <div style="margin-top: 8px;">Modern infrastructure automation for telecom systems.</div>
-      </div>
-      <div class="socials" aria-label="Social links">
-        <a href="https://github.com/mohddilshadkhan2003" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
-        <a href="#top" aria-label="Home"><i class="fa-solid fa-house"></i></a>
-        <a href="#deploy" aria-label="Deploy"><i class="fa-solid fa-rocket"></i></a>
-      </div>
-    </div>
-  </footer>
-</body>
+        const update = () => {
+          if (target === 0) {
+            counter.textContent = "0" + suffix;
+            return;
+          }
+
+          current += Math.ceil(target / 35);
+          if (current >= target) {
+            counter.textContent = target + suffix;
+            return;
+          }
+          counter.textContent = current + suffix;
+          requestAnimationFrame(update);
+        };
+
+        update();
+      });
+    </script>
+  </body>
 </html>

@@ -165,6 +165,16 @@ The default configuration in this repo uses:
 
 You can customize the Terraform variables in `main.tf` to match your environment.
 
+### Restrict SSH access
+
+SSH access is restricted by default to `127.0.0.1/32`, which effectively prevents remote SSH connections until you explicitly set an allowed source. Before deployment, pass your public IPv4 address as a `/32` CIDR instead of opening SSH to the internet:
+
+```bash
+terraform apply -var="allowed_ssh_cidr=YOUR_PUBLIC_IP/32"
+```
+
+For example, replace `YOUR_PUBLIC_IP` with your current public IP address. Avoid using `0.0.0.0/0` for SSH. The HTTP and HTTPS rules remain publicly reachable by default for the demo web service.
+
 ## How the project works
 
 1. The repository stores infrastructure configuration as code.
